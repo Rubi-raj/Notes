@@ -4,7 +4,8 @@
 sequenceDiagram
 participant u as User
 participant ag as Backend Client
-participant sas as Authorization Server
+participant sas as OAuth Server
+participant rs as Resource Server<br>(MS1,MS2....MSn)
 u->>ag: username, password
 ag->>sas: client_id, client_secret, username, password
 ```
