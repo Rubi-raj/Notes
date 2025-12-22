@@ -1,4 +1,4 @@
-# OAuth Architucture
+# OAuth Architecture
 
 ```mermaid
 sequenceDiagram
@@ -23,10 +23,10 @@ Backend server as **API Gateway**🥅🚧⛩️ bellow payload to **Authorizatio
 
 ```json
 {
-    "client_id": "api-gateway1",
-    "client_secret": "gateway-secret",
-    "username": "user1",
-    "password": "user-secret"
+  "client_id": "api-gateway1",
+  "client_secret": "gateway-secret",
+  "username": "user1",
+  "password": "user-secret"
 }
 ```
 
@@ -185,7 +185,7 @@ Microservices trust the gateway and don’t perform authentication.
 # 🧾 Final Flow Summary
 
 | Step        | User              | API Gateway                    | SAS                     |
-| ----------- | ----------------- | ------------------------------ | ----------------------- |
+|-------------|-------------------|--------------------------------|-------------------------|
 | Login       | username/password | adds client_id & client_secret | validates user + client |
 | Token Issue | —                 | receives tokens                | generates tokens        |
 | API Request | sends token       | validates JWT                  | microservice processes  |
