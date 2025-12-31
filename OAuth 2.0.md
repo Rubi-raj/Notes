@@ -23,6 +23,7 @@ PKCE generate's two information
 * **_Code Verifier_** - App generate Random string called `Code Verifier`.
 
 * **_Code Challenge_** - Hashing `Code Verifier` with `SHA-256` called `Code Challenge`.
+> **Code Challenge** is `base64url(sha256(code_verifier))`
 
 ## How PKCE Works ?
 
