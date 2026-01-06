@@ -2,12 +2,12 @@
 
 ```mermaid
 sequenceDiagram
-participant u as User
-participant ag as Backend Client
-participant sas as OAuth Server
-participant rs as Resource Server<br>(MS1,MS2....MSn)
-u->>ag: username, password
-ag->>sas: client_id, client_secret, username, password
+    participant u as User
+    participant ag as Backend Client
+    participant sas as OAuth Server
+    participant rs as Resource Server<br>(MS1,MS2....MSn)
+    u ->> ag: username, password
+    ag ->> sas: client_id, client_secret, username, password
 ```
 
 ----
@@ -58,7 +58,7 @@ This document explains how authentication works when:
 
 ## ✅ Correct Authentication Flow
 
-### ### 1️⃣ User → API Gateway
+### 1️⃣ User → API Gateway
 
 User sends only their credentials:
 

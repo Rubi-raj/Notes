@@ -5,7 +5,7 @@ Resource Server
 
 Access Token / Refresh Token
 
-OAuth Flows
+## OAuth Flows
 
 * **Authorization Code Flow** - Code is the key to generate access token to access resource.
 
@@ -16,7 +16,7 @@ OAuth Flows
   token
   will generate.
 
-# PKCE - Proof Key for Code Exchange
+## PKCE - Proof Key for Code Exchange
 
 PKCE generate's two information
 
@@ -40,9 +40,9 @@ https://youtu.be/DdhJvxztALI?si=R7G7nHmXolLsNSTT
 sequenceDiagram
     autonumber
     participant u as User
-    participant c as Client APP
-    participant a as OAuth Server
-    participant r as Resource
+    participant c as Client APP <br> (Web or Mobile)
+    participant a as Autorization <br> Server
+    participant r as Resource Server
     u -->> c: click Login Button
     c ->> c: <br>
     Note over c: Generate<br>Code Challenge and verifier
