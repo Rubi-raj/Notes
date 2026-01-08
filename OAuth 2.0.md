@@ -158,8 +158,7 @@ This step prevents **authorization code interception attacks**.
 
 ### 7️⃣ Token Endpoint Response
 
-If verification succeeds, the Authorization Server responds with tokens:
-Here's the response from the token endpoint! The response includes the access token and refresh token.
+If verification succeeds, the Authorization Server responds with access token and refresh token.
 
 ```json
 {
