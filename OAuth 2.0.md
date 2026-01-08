@@ -31,62 +31,56 @@ access token.
 
 PKCE generate's two information
 
-* **_Code Verifier_** - App generate Random string called `Code Verifier`.
+- `code_verifier` → High-entropy random string (43–128 characters)
+- `code_challenge` → `bas64url(sha256(code_verifier))`
 
-* **_Code Challenge_** - Hashing `Code Verifier` with `SHA-256` called `Code Challenge`.
-
-> **Code Challenge** is `base64url(sha256(code_verifier))`
-
-## How PKCE Works ?
-
-![img.png](images/pkce1.png)
-![img.png](images/pkce2.png)
-
-# Resource
-
-https://youtu.be/DdhJvxztALI?si=R7G7nHmXolLsNSTT
-
-## Authorization Code Flow + PKCE
+## Authorization Code Flow + PKCE (HLD)
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as User
-    participant C as Client App (Web / Mobile)
-    participant A as Authorization Server
-    participant R as Resource Server
+    participant C as Client App <br> (SPA / Mobile / Web)
+    participant AS as Authorization Server
+    participant RS as Resource Server
+%% Step 1: User starts login
     U -->> C: Click Login
-    Note over C: Generate <br> code_verifier,code_challenge
-    C -->> A: https://auth-server.com/authorize
-    Note over A: Store authorization request<br>Bind code_challenge + method to auth request
-    A ->> U: Redirect to Login & Consent
-    U -->> A: Authenticate & Approve Consent
-    Note over A: Generate authorization_code<br>Bind it to stored code_challenge
-    A ->> C: Redirect with authorization_code + state
-    C -->> A: /token
-    Note over A: Hash(code_verifier)<br>Compare with stored code_challenge<br>If valid, issue tokens
-    A ->> C: Access Token (+ ID Token if OIDC)
-    C -->> R: API request<br>Authorization: Bearer access_token
-    Note over R: Validate token<br>(signature, expiry, audience)
-    R ->> C: Protected Resource
-
+    Note over C: Generate <br> code_verifier and code_challenge
+%% Step 2: Authorization Request
+    C -->> AS: call /authorize
+%% Step 3: Authentication & Consent
+    AS ->> U: Redirect to Login Page
+    U -->> AS: Authenticate (password / MFA / SSO)
+    AS ->> U: Consent Screen (if required)
+    U -->> AS: Approve Consent
+    Note over AS: Store authorization code, <br>user, client, scope,<br> code_challenge + method
+%% Step 4: Redirect with Authorization Code
+    AS ->> C: Redirect to redirect_uri <br> (code, state)
+    Note over C: Validate state <br> (User is authenticated & consented)
+%% Step 5: Token Request
+    C -->> AS: call /token
+%% Step 6: PKCE Verification
+    AS ->> AS: SHA256(code_verifier) <br> Base64URL encode <br> Compare with stored code_challenge
+%% Step 7: Token Issuance
+    AS ->> C: access_token + refresh_token
+%% Step 8: API Call
+    C -->> RS: API Request with Authorization: Bearer access_token
+    RS ->> C: Protected Resource
 ```
 
-## How PKCE is working ? (LLD)
+## 🔐 How PKCE is working? (LLD)
 
-### 1️⃣ Login
+### 1️⃣ Login (Client Side)
 
-The user click **Login**, client app generate `code_verifier`, `code_challenge` and `state`. <br> Then store
-`code_verifier`
-and  `state` for later use.
+When the user clicks **Login**, the client application generates a **PKCE pair** and stores the `code_verifier`
+securely (memory / session / secure storage) for later use.
 
-* `state` = Random string
-* `code_verifier` = Random string
-* `code_challenge` = base64url(sha256(code_verifier))
+- `code_verifier` → High-entropy random string (43–128 characters)
+- `code_challenge` → `bas64url(sha256(code_verifier))`
 
-### 2️⃣ Invoke /authorize
+### 2️⃣ Invoke `/authorize` Endpoint
 
-The client app prepare **/authorize** request like bellow and call auth server.
+The client prepares an **authorization request** and redirects the user’s browser to the Authorization Server.
 
 ```url
 https://auth-server.com/authorize
@@ -99,46 +93,72 @@ https://auth-server.com/authorize
   &code_challenge_method=S256
 ```
 
-### 3️⃣ Redirect to Login
+> `state` is a random string used for **CSRF protection** and request correlation.
 
-3. Authorization server store `code_challenge` and compare later during code exchange step.<br> Now the user was
-   redirected back to the client with a few additional query parameters in the URL:
+### 3️⃣ User Authentication & Consent
 
-### 4️⃣ Verify the state parameter
+The Authorization Server:
 
-The user was redirected back to the client with a few additional query parameters in the URL:
+1. Authenticates the user (login, MFA, SSO, etc.)
+2. Displays a consent screen (if required)
+3. Validates the authorization request parameters
 
-  ```url
-?state=B3X7B85DxEamQV_L&code=RiIKa-WTQYKgya_esmeuKvUxHbv830Ktdjkoa4e754gHNIl2 
+The server stores the following temporarily, bound to the authorization code:
+
+* `client_id`,`redirect_uri`,`scope`,`code_challenge`,`code_challenge_method`,`authenticated user`
+
+### 4️⃣ Redirect Back to Client
+
+Now the user was redirected back to the client with a few additional query parameters in the URL:
+
+```url
+https://client-app.com/callback
+  ?code=RiIKa-WTQYKgya_esmeuKvUxHbv830Ktdjkoa4e754gHNIl2
+  &state=B3X7B85DxEamQV_L 
 ```
 
-The state value isn't strictly necessary here since the PKCE parameters provide CSRF protection themselves. In practice,
-if you're sure the OAuth server supports PKCE, you can use the state parameter for application state instead of using it
-for CSRF protection.
+At this point:
 
-### 5. Exchange the Authorization Code
+* ✅ User is authenticated
+* ✅ Consent is granted
+* ❌ No access token exists yet
 
-Now you're ready to exchange the authorization code for an access token.
+The client must validate the returned state value to **prevent CSRF attacks**.
 
-The client will build a POST request to the token endpoint with the following parameters:
+### 5️⃣ Exchange Authorization Code for Tokens
 
-```curl
+The client now exchanges the authorization code for tokens by calling the token endpoint.
+> The previously stored `code_verifier` must be sent in this request.
+
+```url
 POST https://authorization-server.com/token
-
-grant_type=authorization_code
-&client_id=h9wqrtqkmq7631p15v-siAwa
-&client_secret=bafPE8aCuZsXjw1ZZngwJl9C-uDS93lwVIoyBT4nlh5QP3Gl
-&redirect_uri=https://www.oauth.com/playground/authorization-code-with-pkce.html
-&code=RiIKa-WTQYKgya_esmeuKvUxHbv830Ktdjkoa4e754gHNIl2
-&code_verifier=2hevbzj0-ErqW45HhecGzMbQ5RCPyw7xv2h04txtmsFMTBGD
+  ?grant_type=authorization_code
+  &client_id=h9wqrtqkmq7631p15v-siAwa
+  &client_secret=bafPE8aCuZsXjw1ZZngwJl9C-uDS93lwVIoyBT4nlh5QP3Gl
+  &redirect_uri=https://www.oauth.com/playground/authorization-code-with-pkce.html
+  &code=RiIKa-WTQYKgya_esmeuKvUxHbv830Ktdjkoa4e754gHNIl2
+  &code_verifier=2hevbzj0-ErqW45HhecGzMbQ5RCPyw7xv2h04txtmsFMTBGD
 ```
 
-Remember the **'code_verifier'**? You'll need to send that along with the token request. The authorization server will
-check whether the verifier matches the challenge that was used in the authorization request. This ensures that a
-malicious party that intercepted the authorization code will not be able to use it.
+> 🔐 Public clients (SPA / Mobile) must not use client_secret<br>
+> 🔐 Confidential clients authenticate using client_secret or mTLS
 
-### 6. Token Endpoint Response
+### 6️⃣ PKCE Verification
 
+The Authorization Server verifies PKCE by computing:
+
+> base64url(sha256(code_verifier))
+
+The result must match the previously stored `code_challenge`.
+
+* ✅ Match → Tokens are issued
+* ❌ Mismatch → Request is rejected
+
+This step prevents **authorization code interception attacks**.
+
+### 7️⃣ Token Endpoint Response
+
+If verification succeeds, the Authorization Server responds with tokens:
 Here's the response from the token endpoint! The response includes the access token and refresh token.
 
 ```json
@@ -151,5 +171,8 @@ Here's the response from the token endpoint! The response includes the access to
 }
 ```
 
-Great! Now your application has an access token, and can use it to make API requests on behalf of the user.
+The client can now call protected APIs on behalf of the user.
 
+## Resource
+
+https://youtu.be/DdhJvxztALI?si=R7G7nHmXolLsNSTT
