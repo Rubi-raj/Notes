@@ -1,19 +1,125 @@
-## Index
+# 🍵Java Notes  by Rubi raj
 
-| Topic      |
-|------------|
-| Data Types |
-|            |
-|            |
+## 📝Index
 
----
+1. Data Types
+2. String vs String Builder vs String Buffer
+3. Abstraction vs Interface
+4. final vs finally vs finalize
 
-### Data Types
+## 🔍 Data Types
 
 * **Primitive** - byte, short, int, long, float, double, char and boolean
 * **Non-Primitive** (Reference data type) String, Array
 
-## Java Programs ?
+## 🔍 String
+
+📝 String variable can be created in two ways. **String literal** and **String Object**
+
+```java
+// String literals | stored in String Constant Pool.
+String s1 = "Hello";
+
+// String object | stored in Heap Memory like other objects.
+String s2 = new String("world");
+```
+
+| Feature           | String    | StringBuffer                   | StringBuilder                |
+|-------------------|-----------|--------------------------------|------------------------------|
+| Mutability        | Immutable | Mutable                        | Mutable                      |
+| Thread Safe       | ❌ No      | ✅ Yes (synchronized)           | ❌ No                         |
+| Overrides euqal() | ✅ Yes     | ❌ No  </br>(value compared ==) | ❌ No</br>(value compared ==) |
+
+### 1️⃣ Why is String immutable❓
+
+* Security (used in class loading, DB URLs, etc.)
+* Thread-safety by design
+* String pool
+* Hashcode caching (important for HashMap)
+
+### 2️⃣ Can we make String mutable❓
+
+No. String class is final and immutable by design.
+
+### 3️⃣ What is String Constant Pool ?
+
+String Constant Pool ia a special memory area designed only for Strings.
+It's present inside Heap Space.
+
+### 4️⃣ String use `char[]` or `byte[]` to hold value❓
+
+### 🔹Java 8 and bellow
+
+* String stored data as `char[]`.
+* Each `char` = **2 bytes**
+* Java uses **UTF-16**
+* So every character took **2 bytes**, even if it was simple ASCII
+
+### 🔹 After Java 9 (Compact Strings)
+
+* Java 9 introduced **Compact Strings**, String stored data as `byte[]`.
+    * `byte[] value` → actual data
+    * `coder` → tells encoding type
+
+| coder value | Meaning                  |
+|-------------|--------------------------|
+| 0           | LATIN1 (1 byte per char) |
+| 1           | UTF16 (2 bytes per char) |
+
+```java
+final char[] value; // Always 2 bytes per character.
+final byte[] value; // 1 byte (Latin1) and 2 bytes (UTF16).
+```
+
+### 5️⃣ Explain internal working of concatenation❓
+
+**Q1**
+<!-- @formatter:off -->
+```java
+String a = "aaa";
+String b = "bbb";
+String t = a + b; // execute at Runtime
+
+System.out.println("aaabbb" == t); // Output:- false 
+
+/* Because it's actually forming
+ * String t = new StringBuilder().append(a).append(b).toString();
+ * Now 't' is stored in Heap, so comparing memory make false.
+ */ 
+```
+
+**Q2**
+
+```java
+String a = "Hello" + "World"; // executes at compile time
+
+/**
+ *  1. The concordination will take place at compile time.
+ *  2. No StringBuilder is created, no conversion takes place, 
+ *     both the literals are added together at compile time.
+ *  3. The final result "Hello World" gets saved in Stirng Constant Pool.
+ */
+/
+
+```
+<!-- @formatter:on -->
+
+## 🔍 Abstract class vs Interface
+
+### Abstract class
+
+* Contains both **abstract and non-abstract method**.
+* abstract methods can have implementation details.
+* Can extend class also implement interface's.
+
+### Interface
+
+* Only **abstract methods** are allowed (**only method signature**).
+* After Java 8, **default** / **static** methods are allowed.
+* Variables are by default (**public, static, final**)
+* Can **extend only interface** (**multiple interface**) is possible.
+
+## 🔍 Java Programs ?
 
 1. Leap Year
 2. Armstrong Number
@@ -29,7 +135,7 @@
 12. km-meter / meter-km conversion
 13. Shortest division of a Number
 
-## String Programs ?
+## 🔍 String Programs ?
 
 1. String palindrome
 2. Letter count in a sentence
@@ -50,7 +156,7 @@
 16. Assign numbers starting from 1 to 26 for English letters a to z and find out sum of a given sentence
 17. Find out first N prime numbers and print in reverse order
 18. Get two numbers in two different variables, swap and print output
-19. Get N numbers and store in a array list. Sort the values without using inbuilt function
+19. Get N numbers and store in an array list. Sort the values without using inbuilt function
 20. Merge two arrays and create a new array with numbers in sorted order. Should not use inbuilt function.
 21. Delete given character from the given sentence
 22. Delete vowels from the given sentence
@@ -63,7 +169,7 @@
 29. find letter without space in a sentence
 30. reverse each word
 
-## Concepts from core Java ?
+## 🔍 Concepts from core Java ?
 
 1. OOP'S concepts (Data Abstraction, Encapsulation, Inheritance, Polymorphism)
 2. Basic Java constructs like loops and data types
@@ -81,7 +187,7 @@
 14. File Handling
 15. String Inbuild Methods
 
-## Q/A
+## 🔍 Q/A
 
 1. What is Stack ?
 2. Garbage Collector?
@@ -104,9 +210,10 @@
 19. String Anagram
 20. Print all permutations of String
 
+<!-- @formatter:off -->
+
 ```java
 //-------Important String Inbuild Methods--------//
-// @formatter:off
 String a = "some text";
 
 charAt();
@@ -142,8 +249,8 @@ a.indexof("h") // display the index num /else return -1
 a.indexOf("h",3) // display the index num /else return -1
 a.lastIndexOf("i") // display the index num /else return -1
 a.lastIndexOf("h",3) // display the index num /else return -1
-// @formatter:on
 ```
+<!-- @formatter:on -->
 
 ## Exceptions in Java
 
@@ -198,7 +305,7 @@ It is thrown by String class methods to indicate that an index is either negativ
 
 ### InputMismatchException
 
-If you a are entering wrong datatype.
+If you are entering wrong datatype.
 
 ---
 
@@ -219,11 +326,6 @@ If you a are entering wrong datatype.
 * Internally HashMap contains array of LinkedList.
 * HashMap uses Hashing.
 * All the key value pairs are stored in Heap, only the address is stored in a bucket.
-
-## Q3: What is String Constant Pool ?
-
-String Constant Pool ia a special memory area designed only for Strings.
-It's present inside Heap Space.
 
 # Java Notes by Rubi raj Mani
 
@@ -248,21 +350,6 @@ Object creation (every time)
 
 ```
 
-## 2️⃣ Abstract class vs Interface
-
-### Abstract class
-
-* Contains both **abstract and non-abstract method**.
-* abstract methods can have implementation details.
-* Can extend class also implement interface's.
-
-### Interface
-
-* Only **abstract methods** are allowed (**only method signature**).
-* After Java 8, **default** / **static** methods are allowed.
-* Variables are by default (**public, static, final**)
-* Can **extend only interface** (**multiple interface**) is possibe.
-
 ## 3️⃣ Method Overloading vs Overriding
 
 <!-- @formatter:off -->
@@ -273,9 +360,9 @@ print(String string);
 add(int a, int b);
 add(long a, long b);
 ```
-<!-- @formatter:off -->
+<!-- @formatter:on -->
 
-### 1️⃣ Hashtable vs Hashmap vs ConcurrentHashMap
+### Hashtable vs Hashmap vs ConcurrentHashMap
 
 | Hashtable | HashMap | ConcurrentHashMap |
 |-----------|---------|-------------------|
