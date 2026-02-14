@@ -6,6 +6,8 @@
 2. String vs String Builder vs String Buffer
 3. Abstraction vs Interface
 4. final vs finally vs finalize
+5. equals() vs hashCode()
+6. Comparable vs Comparator
 
 ## 🔍 Data Types
 
@@ -24,11 +26,12 @@ String s1 = "Hello";
 String s2 = new String("world");
 ```
 
-| Feature           | String    | StringBuffer                   | StringBuilder                |
-|-------------------|-----------|--------------------------------|------------------------------|
-| Mutability        | Immutable | Mutable                        | Mutable                      |
-| Thread Safe       | ❌ No      | ✅ Yes (synchronized)           | ❌ No                         |
-| Overrides euqal() | ✅ Yes     | ❌ No  </br>(value compared ==) | ❌ No</br>(value compared ==) |
+| Feature           | String       | StringBuffer                   | StringBuilder                |
+|-------------------|--------------|--------------------------------|------------------------------|
+| Mutability        | Immutable    | Mutable                        | Mutable                      |
+| Thread Safe       | ❌ No         | ✅ Yes (synchronized)           | ❌ No                         |
+| Overrides euqal() | ✅ Yes        | ❌ No  </br>(value compared ==) | ❌ No</br>(value compared ==) |
+| Memory            | SCP and Heap | Heap                           | Heap                         |
 
 ### 1️⃣ Why is String immutable❓
 
@@ -118,6 +121,64 @@ String a = "Hello" + "World"; // executes at compile time
 * After Java 8, **default** / **static** methods are allowed.
 * Variables are by default (**public, static, final**)
 * Can **extend only interface** (**multiple interface**) is possible.
+
+## 🔍 final vs finally vs finalize ?
+
+* **final** is a keyword
+* **finally** is a block
+* **finalize** is method Called by GC before object destruction (**Deprecated (Java 9+)**)
+
+## 🔍 equals() vs hashCode()
+
+* They are used to compare if two objects are same or not.
+* They are used in Hashing based data structures like Hashset, HashMap and HashTable.
+* They are used in String.
+* Both methods are part of Object class.
+* hashCode() - It is used to create hash value for an object. Hash means a unique integer value that can be assigned to
+  your object for its identification.
+
+> Note:- As per the contract, whenever we override equals(), we must override hashCode() as well.
+
+## 🔍 Comparable vs Comparator
+
+### 🔹 Comparable
+
+Comparable is an interface which provide `public int compareTo(T o);` method.
+Which is useful when we want sorting in Objects.
+
+* Class should implement Comparable interface.
+* Only one sorting logic required.
+
+For example `x.compareTo(y)`
+
+* `x > y` value will be 1
+* `x = y` value will be 0
+* `x < y` value will be -1
+
+
+### 🔹 Comparator
+
+* Comparator is a Functional Interface which provide `int compare(T o1, T o2);`
+* It will be declared outside the class, in `Collections.sort(List<T> list, Comparator<? super T> c)`
+* We can write multiple sorting logic.
+* Want runtime sorting flexibility
+
+> **Comparable** is used to define **natural ordering inside the class** using compareTo().</br>
+> **Comparator** is used to define **custom sorting logic outside the class** using compare().
+
+In Java 8+, Comparator became powerful:
+
+```java
+// Natural sorting
+employeeList.sort(
+    Comparator.comparing(Employee::getSalary)
+);
+
+// Reversed sorting
+employeeList.sort(
+		Comparator.comparing(Employee::getSalary).reversed()
+);
+```
 
 ## 🔍 Java Programs ?
 
@@ -308,17 +369,6 @@ It is thrown by String class methods to indicate that an index is either negativ
 If you are entering wrong datatype.
 
 ---
-
-## Q1: equals() vs hashCode()
-
-* They are used to compare if two objects are same or not.
-* They are used in Hashing based data structures like Hashset, HashMap and HashTable.
-* They are used in String.
-* Both methods are part of Object class.
-* hashCode() - It is used to create hash value for an object. Hash means a unique integer value that can be assigned to
-  your object for its identification.
-
-> Note:- As per the contract, whenever we override equals(), we must override hashCode() as well.
 
 ## Q2: How HashMap internally works ?
 
