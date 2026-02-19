@@ -2,36 +2,141 @@
 
 ## 📝Index
 
-1. Data Types
-2. String vs String Builder vs String Buffer
-3. Abstraction vs Interface
-4. final vs finally vs finalize
-5. equals() vs hashCode()
-6. Comparable vs Comparator
+<!-- TOC -->
+
+* [🔍 What is Java ?](#-what-is-java-)
+    * [🤔 Meaning of Java ?](#-meaning-of-java-)
+* [🔍 Variables](#-variables)
+* [🔍 Data Types](#-data-types)
+* [🔍 JVM Memory](#-jvm-memory)
+* [🔍 Naming Convention](#-naming-convention)
+* [🔍 String](#-string)
+    * [1️⃣ Why is String immutable❓](#1-why-is-string-immutable)
+    * [2️⃣ Can we make String mutable❓](#2-can-we-make-string-mutable)
+    * [3️⃣ What is String Constant Pool ?](#3-what-is-string-constant-pool-)
+    * [4️⃣ String use `char[]` or `byte[]` to hold value❓](#4-string-use-char-or-byte-to-hold-value)
+    * [🔹Java 8 and bellow](#java-8-and-bellow)
+    * [🔹 After Java 9 (Compact Strings)](#-after-java-9-compact-strings)
+    * [5️⃣ Explain internal working of concatenation❓](#5-explain-internal-working-of-concatenation)
+    * [🔍 Abstract class vs Interface](#-abstract-class-vs-interface)
+    * [Abstract class](#abstract-class)
+    * [Interface](#interface)
+    * [🔍 final vs finally vs finalize ?](#-final-vs-finally-vs-finalize-)
+    * [🔍 equals() vs hashCode()](#-equals-vs-hashcode)
+    * [🔍 Comparable vs Comparator](#-comparable-vs-comparator)
+    * [🔹 Comparable](#-comparable)
+    * [🔹 Comparator](#-comparator)
+    * [🔍 How HashMap internally works ?](#-how-hashmap-internally-works-)
+    * [What is Hash Collision ?](#what-is-hash-collision-)
+    * [Internal Implementation](#internal-implementation)
+* [🔍 Java Programs ?](#-java-programs-)
+* [🔍 String Programs ?](#-string-programs-)
+* [🔍 Concepts from core Java ?](#-concepts-from-core-java-)
+* [🔍 Q/A](#-qa)
+* [Exceptions in Java](#exceptions-in-java)
+    * [ArithmeticException](#arithmeticexception)
+    * [ArrayIndexOutOfBoundsException](#arrayindexoutofboundsexception)
+    * [ClassNotFoundException](#classnotfoundexception)
+    * [FileNotFoundException](#filenotfoundexception)
+    * [IOException](#ioexception)
+    * [InterruptedException](#interruptedexception)
+    * [NoSuchFieldException](#nosuchfieldexception)
+    * [NoSuchMethodException](#nosuchmethodexception)
+    * [NullPointerException](#nullpointerexception)
+    * [NumberFormatException](#numberformatexception)
+    * [RuntimeException](#runtimeexception)
+    * [StringIndexOutOfBoundsException](#stringindexoutofboundsexception)
+    * [InputMismatchException](#inputmismatchexception)
+* [Java Notes by Rubi raj Mani](#java-notes-by-rubi-raj-mani)
+    * [1️⃣ How a Java Class will Load ?](#1-how-a-java-class-will-load-)
+    * [3️⃣ Method Overloading vs Overriding](#3-method-overloading-vs-overriding)
+        * [Hashtable vs Hashmap vs ConcurrentHashMap](#hashtable-vs-hashmap-vs-concurrenthashmap)
+
+<!-- TOC -->
+
+1. What is Java ?
+2. OOPS
+3. Variables
+4. Data Types
+5. JVM Memory
+6. Naming convention
+7. String vs String Builder vs String Buffer
+8. Abstraction vs Interface
+9. final vs finally vs finalize
+10. equals() vs hashCode()
+11. Comparable vs Comparator
+12. How HashMap internally works ?
+
+## 🔍 What is Java ?
+
+* Java is a high level, robust, **object-oriented** and secure programming language.
+* Robust, Portable, Platform-independent, Secured, High Performance, Multithreaded, Architecture Neutral,
+  Object-Oriented, Interpreted, and Dynamic.
+* **Author:-** James Gosling
+* **Year**:- 1995
+
+### 🤔 Meaning of Java ?
+
+Java is an **island in Indonesia** where the first coffee was produced (called **Java coffee**). </br>
+It is a kind of espresso bean. **Java name was chosen by James Gosling** while having a cup of coffee nearby his office.
+
+## 🔍 Variables
+
+Variable is a key to store their values. There are three types of variables.
+
+* **Local Variable** - Declaring inside a method or block
+* **Instance Variable** - Declaring inside a class
+* **Static Variable** - Declaring inside a class with static keyword.
 
 ## 🔍 Data Types
 
 * **Primitive** - byte, short, int, long, float, double, char and boolean
 * **Non-Primitive** (Reference data type) String, Array
 
+## 🔍 JVM Memory
+
+* **Method Area** - Metadata of the class, Blueprint of the class.
+    * Static variables
+    * Class name
+    * Immediate parent class name
+    * Methods
+    * Variables information
+* **Heap Memory** - All objects is stored in the heap area. (**Instance variables**)
+* **Stack Memory** - Thread audit information, **Reference variables.**
+* **PC Registers** - Store address of **current execution thread information**. Each thread has separate PC
+  Registers.
+* **Native Method Stack** - Native methods are the ones that are written in some other language but integrated in the
+  JDK.
+
+## 🔍 Naming Convention
+
+| Type          | Description                                | Example                            |
+|---------------|--------------------------------------------|------------------------------------|
+| **Class**     | It should start with the uppercase letter. | `public class Employee`            |
+| **Interface** | It should start with the uppercase letter. | `interface Printable`              |
+| **Methods**   | It should start with lowercase letter.     | `void draw()`                      |
+| **Variable**  | It should start with lowercase letter.     | `id, name`                         |
+| **Package**   | It should be a lowercase letter.           | `java, lang, java.util, java.lang` |
+| **Constant**  | It should be in uppercase letters.         | `RED, YELLOW, MIN_AGE = 18;`       |
+
 ## 🔍 String
 
 📝 String variable can be created in two ways. **String literal** and **String Object**
 
 ```java
-// String literals | stored in String Constant Pool.
+// String literals | stored in String Constant Pool(SCP).
 String s1 = "Hello";
 
-// String object | stored in Heap Memory like other objects.
+// String object | stored in Heap Memory like other objects. also in SCP.
 String s2 = new String("world");
 ```
 
-| Feature           | String       | StringBuffer                   | StringBuilder                |
-|-------------------|--------------|--------------------------------|------------------------------|
-| Mutability        | Immutable    | Mutable                        | Mutable                      |
-| Thread Safe       | ❌ No         | ✅ Yes (synchronized)           | ❌ No                         |
-| Overrides euqal() | ✅ Yes        | ❌ No  </br>(value compared ==) | ❌ No</br>(value compared ==) |
-| Memory            | SCP and Heap | Heap                           | Heap                         |
+| Feature               | String       | StringBuffer                   | StringBuilder                |
+|-----------------------|--------------|--------------------------------|------------------------------|
+| **Mutability**        | Immutable    | Mutable                        | Mutable                      |
+| **Thread Safe**       | ❌ No         | ✅ Yes (synchronized)           | ❌ No                         |
+| **Overrides euqal()** | ✅ Yes        | ❌ No  </br>(value compared ==) | ❌ No</br>(value compared ==) |
+| **Memory**            | SCP and Heap | Heap                           | Heap                         |
 
 ### 1️⃣ Why is String immutable❓
 
@@ -124,9 +229,9 @@ String a = "Hello" + "World"; // executes at compile time
 
 ## 🔍 final vs finally vs finalize ?
 
-* **final** is a keyword
-* **finally** is a block
-* **finalize** is method Called by GC before object destruction (**Deprecated (Java 9+)**)
+* **final** - Is a keyword, to define constants, to prevent inheritance, and restrict method overriding.
+* **finally** - A block used with try-catch to ensure a section of code always executes.
+* **finalize** - is method Called by GC before object destruction. **Deprecated in (Java 9+)**
 
 ## 🔍 equals() vs hashCode()
 
@@ -134,10 +239,11 @@ String a = "Hello" + "World"; // executes at compile time
 * They are used in Hashing based data structures like Hashset, HashMap and HashTable.
 * They are used in String.
 * Both methods are part of Object class.
-* hashCode() - It is used to create hash value for an object. Hash means a unique integer value that can be assigned to
+* `hashCode()` - It is used to create hash value for an object. **Hash means a unique integer** value that can be
+  assigned to
   your object for its identification.
 
-> Note:- As per the contract, whenever we override equals(), we must override hashCode() as well.
+> Note:- As per the contract, whenever we override `equals()`, we must override `hashCode()` as well.
 
 ## 🔍 Comparable vs Comparator
 
@@ -155,7 +261,6 @@ For example `x.compareTo(y)`
 * `x = y` value will be 0
 * `x < y` value will be -1
 
-
 ### 🔹 Comparator
 
 * Comparator is a Functional Interface which provide `int compare(T o1, T o2);`
@@ -168,17 +273,48 @@ For example `x.compareTo(y)`
 
 In Java 8+, Comparator became powerful:
 
+<!-- @formatter:off -->
+
 ```java
 // Natural sorting
 employeeList.sort(
-    Comparator.comparing(Employee::getSalary)
+      Comparator.comparing(Employee::getSalary)
 );
 
 // Reversed sorting
 employeeList.sort(
-		Comparator.comparing(Employee::getSalary).reversed()
+      Comparator.comparing(Employee::getSalary).reversed()
 );
 ```
+<!-- @formatter:on -->
+
+## 🔍 How HashMap internally works ?
+
+> * Default capacity is **16**.
+> * Internally HashMap contains **Array of LinkedList**.
+> * HashMap uses **Hashing**.
+> * All the key value pairs are stored in Heap, only the **Address is stored in a array bucket**.
+> * put(), get(), remove() all these operations are **O(1)** Time complexity.
+> * On Collision Time Complexity is **O(1 + length of LinkedList)**
+
+### What is Hash Collision ?
+
+Two different or same key Hash value become the same called Collision.
+
+<!-- @formatter:off -->
+```java
+{"rubi":27, "kavin":23}
+
+hash(rubi)  --> 6
+hash(kavin) --> 6
+// Both output value is same, this is called collision.
+```
+<!-- @formatter:on -->
+
+### Internal Implementation
+
+* Hashmap will pass **Key to Hash function**, output will be used for **indexing the array**.
+* If Collision happened it will be added in LinkedList of the same index.
 
 ## 🔍 Java Programs ?
 
@@ -369,13 +505,6 @@ It is thrown by String class methods to indicate that an index is either negativ
 If you are entering wrong datatype.
 
 ---
-
-## Q2: How HashMap internally works ?
-
-* Default capacity is 16.
-* Internally HashMap contains array of LinkedList.
-* HashMap uses Hashing.
-* All the key value pairs are stored in Heap, only the address is stored in a bucket.
 
 # Java Notes by Rubi raj Mani
 
