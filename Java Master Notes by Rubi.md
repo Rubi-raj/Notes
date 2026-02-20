@@ -3,14 +3,15 @@
 ## 📝Index
 
 <!-- TOC -->
-
-* [🔍 What is Java ?](#-what-is-java-)
+* [🍵Java Notes by Rubi raj](#java-notes-by-rubi-raj)
+  * [📝Index](#index)
+  * [🔍 What is Java ?](#-what-is-java-)
     * [🤔 Meaning of Java ?](#-meaning-of-java-)
-* [🔍 Variables](#-variables)
-* [🔍 Data Types](#-data-types)
-* [🔍 JVM Memory](#-jvm-memory)
-* [🔍 Naming Convention](#-naming-convention)
-* [🔍 String](#-string)
+  * [🔍 Variables](#-variables)
+  * [🔍 Data Types](#-data-types)
+  * [🔍 JVM Memory](#-jvm-memory)
+  * [🔍 Naming Convention](#-naming-convention)
+  * [🔍 String](#-string)
     * [1️⃣ Why is String immutable❓](#1-why-is-string-immutable)
     * [2️⃣ Can we make String mutable❓](#2-can-we-make-string-mutable)
     * [3️⃣ What is String Constant Pool ?](#3-what-is-string-constant-pool-)
@@ -18,22 +19,22 @@
     * [🔹Java 8 and bellow](#java-8-and-bellow)
     * [🔹 After Java 9 (Compact Strings)](#-after-java-9-compact-strings)
     * [5️⃣ Explain internal working of concatenation❓](#5-explain-internal-working-of-concatenation)
-    * [🔍 Abstract class vs Interface](#-abstract-class-vs-interface)
+  * [🔍 Abstract class vs Interface](#-abstract-class-vs-interface)
     * [Abstract class](#abstract-class)
     * [Interface](#interface)
-    * [🔍 final vs finally vs finalize ?](#-final-vs-finally-vs-finalize-)
-    * [🔍 equals() vs hashCode()](#-equals-vs-hashcode)
-    * [🔍 Comparable vs Comparator](#-comparable-vs-comparator)
+  * [🔍 final vs finally vs finalize ?](#-final-vs-finally-vs-finalize-)
+  * [🔍 equals() vs hashCode()](#-equals-vs-hashcode)
+  * [🔍 Comparable vs Comparator](#-comparable-vs-comparator)
     * [🔹 Comparable](#-comparable)
     * [🔹 Comparator](#-comparator)
-    * [🔍 How HashMap internally works ?](#-how-hashmap-internally-works-)
+  * [🔍 How HashMap internally works ?](#-how-hashmap-internally-works-)
     * [What is Hash Collision ?](#what-is-hash-collision-)
     * [Internal Implementation](#internal-implementation)
-* [🔍 Java Programs ?](#-java-programs-)
-* [🔍 String Programs ?](#-string-programs-)
-* [🔍 Concepts from core Java ?](#-concepts-from-core-java-)
-* [🔍 Q/A](#-qa)
-* [Exceptions in Java](#exceptions-in-java)
+  * [🔍 Java Programs ?](#-java-programs-)
+  * [🔍 String Programs ?](#-string-programs-)
+  * [🔍 Concepts from core Java ?](#-concepts-from-core-java-)
+  * [🔍 Q/A](#-qa)
+  * [Exceptions in Java](#exceptions-in-java)
     * [ArithmeticException](#arithmeticexception)
     * [ArrayIndexOutOfBoundsException](#arrayindexoutofboundsexception)
     * [ClassNotFoundException](#classnotfoundexception)
@@ -48,10 +49,17 @@
     * [StringIndexOutOfBoundsException](#stringindexoutofboundsexception)
     * [InputMismatchException](#inputmismatchexception)
 * [Java Notes by Rubi raj Mani](#java-notes-by-rubi-raj-mani)
-    * [1️⃣ How a Java Class will Load ?](#1-how-a-java-class-will-load-)
-    * [3️⃣ Method Overloading vs Overriding](#3-method-overloading-vs-overriding)
-        * [Hashtable vs Hashmap vs ConcurrentHashMap](#hashtable-vs-hashmap-vs-concurrenthashmap)
-
+  * [1️⃣ How a Java Class will Load ?](#1-how-a-java-class-will-load-)
+  * [3️⃣ Method Overloading vs Overriding](#3-method-overloading-vs-overriding)
+    * [Hashtable vs Hashmap vs ConcurrentHashMap](#hashtable-vs-hashmap-vs-concurrenthashmap)
+  * [🔍 What is Java LTS Versions & Major Features](#-what-is-java-lts-versions--major-features)
+    * [**Java 8**](#java-8)
+    * [**Java 11**](#java-11)
+    * [**Java 17**](#java-17)
+    * [**Java 21**](#java-21)
+  * [🔍 Records](#-records)
+    * [📌 Record Scope](#-record-scope)
+    * [📌 Where Records Can Exist ?](#-where-records-can-exist-)
 <!-- TOC -->
 
 1. What is Java ?
@@ -543,9 +551,9 @@ add(long a, long b);
 
 ### Hashtable vs Hashmap vs ConcurrentHashMap
 
-| Hashtable | HashMap | ConcurrentHashMap |
-|-----------|---------|-------------------|
-| Legacy    |         |                   |
+| Hashtable  |  HashMap  |  ConcurrentHashMap |
+|:-----------|:---------:|-------------------:|
+| Legacy     |           |                    |
 
 ## 🔍 What is Java LTS Versions & Major Features
 
@@ -590,3 +598,39 @@ Java 8, 11, 17, 21 are considered as LTS versions.
 * **Record Patterns** - Better data extraction.
 * **Sequenced Collections** - Ordered collections API improvements.
 
+---
+
+## 🔍 Records
+
+**Records** are used to create **immutable data carrier** classes with very less boilerplate.
+
+Compiler automatically creates:- **constructor, getters**, `equals()`, `hashCode()`, `toString()`
+
+### 📌 Record Scope
+
+* Records are **implicitly `static`, `final`** So explicit `static` declaration not allowed.
+* Records **cannot Extend Classes.** but **Implement Interfaces.**
+* ALl the fields are `private final` Example `record User(String name){}`
+* Records can have **methods and static variables.**
+* Records only allow **all-args constructor**.
+
+### 📌 Where Records Can Exist ?
+
+```java
+// Top-Level Record (Like normal class)
+public record User(int id, String name) {
+}
+
+// Nested Record (Inside Class)
+class Company {
+	record User(String name) {
+	}
+}
+
+// Local Record (Inside Method)
+void process() {
+	record User(String name) {
+	}
+	User user = new User("Rubi");
+}
+```
