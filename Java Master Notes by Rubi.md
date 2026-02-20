@@ -1,4 +1,4 @@
-# 🍵Java Notes  by Rubi raj
+# 🍵Java Notes by Rubi raj
 
 ## 📝Index
 
@@ -546,4 +546,47 @@ add(long a, long b);
 | Hashtable | HashMap | ConcurrentHashMap |
 |-----------|---------|-------------------|
 | Legacy    |         |                   |
+
+## 🔍 What is Java LTS Versions & Major Features
+
+Java 8, 11, 17, 21 are considered as LTS versions.
+
+### **Java 8**
+
+* **Lambda Expressions** → `list.forEach(x -> System.out.println(x));`
+* **Stream API** → Functional programming, Parallel processing, Cleaner collections handling.
+* **Functional Interfaces** → `Predicate, Function, Consumer`
+* **Optional Class** → Avoid `NullPointerException`
+* **New Date & Time API** → `LocalDate, LocalDateTime`
+* **Default & Static** methods in interfaces.
+
+### **Java 11**
+
+* New **HTTP Client** API → `HttpClient client = HttpClient.newHttpClient();`
+* **String Enhancements** → `isBlank(), lines(), strip(), repeat(n)`
+* `var` in **Lambda** parameters
+* **Z Garbage Collector (ZGC)** _(low latency GC)_
+* **Flight Recorder** → JVM monitoring & profiling
+
+### **Java 17**
+
+* **Records** → `record User(String name, int age) {}`
+* **Sealed Classes** → Controlled inheritance. `sealed class Shape permits Circle, Square {}`
+* **Pattern Matching** for `instanceof` → `obj instanceof String s`
+
+### **Java 21**
+
+* **Virtual Threads** _(Project Loom)_ → Handle millions of threads. `Thread.startVirtualThread(() -> process());`
+* **Pattern Matching for Switch**
+
+  <!-- @formatter:off -->
+  ```java
+  switch (obj) {
+      case String s -> ...
+      case Integer i -> ...
+  }  
+   ```
+  <!-- @formatter:on -->
+* **Record Patterns** - Better data extraction.
+* **Sequenced Collections** - Ordered collections API improvements.
 
