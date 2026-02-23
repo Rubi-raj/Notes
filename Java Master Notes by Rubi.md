@@ -301,7 +301,7 @@ employeeList.sort(
 > * Default capacity is **16**.
 > * Internally HashMap contains **Array of LinkedList**.
 > * HashMap uses **Hashing**.
-> * All the key value pairs are stored in Heap, only the **Address is stored in a array bucket**.
+> * All the key value pairs are stored in Heap, only the **Address is stored in an array bucket**.
 > * put(), get(), remove() all these operations are **O(1)** Time complexity.
 > * On Collision Time Complexity is **O(1 + length of LinkedList)**
 
@@ -610,7 +610,7 @@ Compiler automatically creates:- **constructor, getters**, `equals()`, `hashCode
 
 * Records are **implicitly `static`, `final`** So explicit `static` declaration not allowed.
 * Records **cannot Extend Classes.** but **Implement Interfaces.**
-* ALl the fields are `private final` Example `record User(String name){}`
+* All the fields are `private final` Example `record User(String name){}`
 * Records can have **methods and static variables.**
 * Records only allow **all-args constructor**.
 
@@ -622,7 +622,7 @@ public record User(int id, String name) {
 }
 
 // Nested Record (Inside Class)
-class Company {
+class School {
 	record User(String name) {
 	}
 }
