@@ -1,0 +1,165 @@
+What is Thread ?
+	A thread = independent execution path inside same application.
+
+What are the @FunctionalInterface available in Java ?
+ * Runnable
+ 
+ExecutorService
+	Its a thread pool
+	
+Race Condition
+	
+@EnableAsync
+@Async
+
+1️⃣ Process vs Thread
+OS
+ └── Process (Java App)
+       ├── Thread-1 (API request)
+       ├── Thread-2 (API request)
+       └── Thread-3 (Kafka consumer)
+
+Parallel vs Concurrent
+
+
+Thread t1 = new Thread();
+
+
+### Learn?
+
+What is Thread States ?
+
+NEW				- new Thread()
+RUNNABLE		- new Thread().start()
+BLOCKED			- If another thread enters same block. Current thread in BLOCKED state (locked)
+WAITING			- Thread waits indefinitely until another thread wakes it. Triggered by: object.join(); object.wait(); Thread sleeps forever until: object.notify();
+TIMED_WAITING	- Waiting for specific time. Triggered by: Thread.sleep(1000); join(2000); wait(5000);
+TERMINATED		- Thread finished execution.
+
+
+start()
+sleep()
+join()
+wait()
+notify()
+
+Executor Framework ?
+Why Creating threads is expensive.
+
+FixedThreadPool?
+CachedThreadPool?
+SingleThreadExecutor?
+ScheduledExecutor?
+
+What isCallable & Future?
+
+What is volatile keyword ?
+
+What is Locks API ?
+ReentrantLock? 
+ReadWriteLock?
+Deadlock?
+
+ReentrantLock lock = new ReentrantLock();
+
+lock.lock();
+try {
+   count++;
+} finally {
+   lock.unlock();
+}
+
+
+CompletableFuture ?
+ForkJoinPool ?
+
+
+=====================
+
+What is Defensive copying?
+What is Canonical constructor?
+
+=======================
+
+final constructor is possible ?
+why constructor is not having final ?
+lifecycle of a spring bean ?
+
+What is BeanFactory ?
+
+==========================
+
+Mutual TLS (mTLS)
+DPoP (Demonstrating Proof-of-Possession)
+
+=========================
+
+The circuit breaker has three states:
+
+Closed:
+In this state, the circuit breaker allows normal service communication, and requests go through to the service.
+Circuit breaker monitors the responses from the service for errors. If the responses are successful with no issues, it remains in the closed state.
+
+Open:
+When the number of failures reaches a threshold, the circuit breaker switches to the open state, preventing requests from reaching the service and providing a fallback response.
+(Threshold Value like 5 failures within 10 seconds)
+
+Half-Open:
+Once the timeout or reset interval passes, the circuit breaker goes to the “Half-Open” state.
+It allows a limited number of test requests to pass through to the service to see if the service has recovered or not.
+If the test requests succeed, it means the service has recovered and the circuit breaker goes back to “Closed” state.
+If any of the test requests fails, it means the service has still issues and the circuit breaker goes to “Open” state to block further requests.
+
+=======================
+
+public class ShallowVsDeepCopy {
+
+	/* 1. Shallow copy creates a new object, but it copies only the references of nested objects.
+	 * 2. Deep copy creates a new object and also creates new copies of all nested objects
+	 */
+
+	public static void main(String[] args) {
+
+		Address address = new Address();
+		address.city = "Salem";
+		Person person1 = new Person();
+		person1.address = address;
+		person1.name = "Mani";
+
+		// Shallow copy
+		Person person2 = person1;  // or p1.clone() with default clone()
+		person2.address.city = "Namakkal";
+
+		System.out.println("Main Address: " + person1.address.city);
+		System.out.println("Main Address after Shallow copy: " + person2.address.city);
+
+		Person person3 = new Person(person1);
+		person3.address.city = "Delhi";
+		System.out.println("Main Address after Deep copy: " + person3.address.city);
+
+	}
+}
+
+class Address {
+	String city;
+
+	Address() {
+	}
+
+	public Address(Address address) {
+		this.city = address.city;
+	}
+}
+
+class Person {
+	String name;
+	Address address;
+
+	Person() {
+	}
+
+	Person(Person otherPerson) {
+		this.name = otherPerson.name;
+		this.address = new Address(otherPerson.address); // Deep copy
+	}
+}

@@ -1,0 +1,2370 @@
+[appuser@sblsftapt01 SVC]$ cat *.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-host
+  labels:
+    app: apigateway
+spec:
+  type: NodePort
+  selector:
+    app: apigateway
+  ports:
+    - name: apigateway
+      port: 8765
+      targetPort: 8765
+      nodePort: 30009
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservice
+  labels:
+    app: apigateway
+spec:
+  type: NodePort
+  selector:
+    app: apigateway
+  ports:
+    - name: apigateway
+      port: 8765
+      targetPort: 8765
+      nodePort: 30003
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: apigateway
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: apigateway
+  template:
+    metadata:
+      labels:
+        app: apigateway
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V731-api-gateway
+          imagePullPolicy: Always
+          name: apigateway
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: apigateway
+              containerPort: 8765
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf/"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: applogsservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: applogsservice
+  template:
+    metadata:
+      labels:
+        app: applogsservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-appLogsMicroService
+          imagePullPolicy: Always
+          name: applogsservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8091
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: auditservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: auditservice
+  template:
+    metadata:
+      labels:
+        app: auditservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-auditMicroService
+          imagePullPolicy: Always
+          name: auditservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8089
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: beatservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: beatservice
+  template:
+    metadata:
+      labels:
+        app: beatservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-beatMicroService
+          imagePullPolicy: Always
+          name: beatservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: service
+              containerPort: 8082
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: complaintservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: complaintservice
+  template:
+    metadata:
+      labels:
+        app: complaintservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-complaintMicroService
+          imagePullPolicy: Always
+          name: complaintservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8084
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: customerservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: customerservice
+  template:
+    metadata:
+      labels:
+        app: customerservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-customerMicroService
+          imagePullPolicy: Always
+          name: customerservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8081
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: customservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: customservice
+  template:
+    metadata:
+      labels:
+        app: customservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-customMicroService
+          imagePullPolicy: Always
+          name: customservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8083
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: discovery-server-host
+  labels:
+    app: discoveryserver
+spec:
+  type: NodePort
+  selector:
+    app: discoveryserver
+  ports:
+    - name: discovery
+      port: 8761
+      targetPort: 8761
+      nodePort: 30001
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: discoveryserver
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: discoveryserver
+  template:
+    metadata:
+      labels:
+        app: discoveryserver
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-DiscoveryServer
+          imagePullPolicy: Always
+          name: discoveryserver
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8761
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dummyservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: dummyservice
+  template:
+    metadata:
+      labels:
+        app: dummyservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V113-dummyMicroService
+          imagePullPolicy: Always
+          name: dummyservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8088
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: interfacemicroservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: interfacemicroservice
+  template:
+    metadata:
+      labels:
+        app: interfacemicroservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-interfaceMicroService
+          imagePullPolicy: Always
+          name: interfacemicroservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8111
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: inventoryservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: inventoryservice
+  template:
+    metadata:
+      labels:
+        app: inventoryservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-inventoryMicroService
+          imagePullPolicy: Always
+          name: inventoryservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8100
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mobileappservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: mobileappservice
+  template:
+    metadata:
+      labels:
+        app: mobileappservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-mobileAppMicroService
+          imagePullPolicy: Always
+          name: mobileappservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8090
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mobileservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: mobileservice
+  template:
+    metadata:
+      labels:
+        app: mobileservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-mobileMicroService
+          imagePullPolicy: Always
+          name: mobileservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8101
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: notificationservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: notificationservice
+  template:
+    metadata:
+      labels:
+        app: notificationservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-notificationMicroService
+          imagePullPolicy: Always
+          name: notificationservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8096
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: orderservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: orderservice
+  template:
+    metadata:
+      labels:
+        app: orderservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-orderMicroService
+          imagePullPolicy: Always
+          name: orderservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8098
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: organizationservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: organizationservice
+  template:
+    metadata:
+      labels:
+        app: organizationservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V743-organizationMicroService
+          imagePullPolicy: Always
+          name: organizationservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8094
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+            - mountPath: /home/appuser/snoc/jobenginereports/
+              name: jobenginereport
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+        - name : jobenginereport
+          persistentVolumeClaim:
+            claimName: jobenginereport-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: posservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: posservice
+  template:
+    metadata:
+      labels:
+        app: posservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-posMicroService
+          imagePullPolicy: Always
+          name: posservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8092
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: productservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: productservice
+  template:
+    metadata:
+      labels:
+        app: productservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-productMicroService
+          imagePullPolicy: Always
+          name: productservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8099
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: reportservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: reportservice
+  template:
+    metadata:
+      labels:
+        app: reportservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-reportMicroService
+          imagePullPolicy: Always
+          name: reportservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8097
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "2Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+            - mountPath: /home/appuser/snoc/jobenginereports/
+              name: jobenginereport
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+        - name : jobenginereport
+          persistentVolumeClaim:
+            claimName: jobenginereport-claim
+apiVersion: v1
+kind: Service
+metadata:
+  name: snoccompositeservices
+  labels:
+    app: snoccompositeservices
+spec:
+  type: NodePort
+  selector:
+    app: snoccompositeservices
+  ports:
+    - name: snoccompositeservices
+      port: 8086
+      targetPort: 8086
+      nodePort: 30010
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: snoccompositeservices
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: snoccompositeservices
+  template:
+    metadata:
+      labels:
+        app: snoccompositeservices
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V723-snocCompositeServices
+          imagePullPolicy: Always
+          name: snoccompositeservices
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8086
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: config-server-host
+  labels:
+    app: springconfigserver
+spec:
+  type: NodePort
+  selector:
+    app: springconfigserver
+  ports:
+    - name: configserver
+      port: 8888
+      targetPort: 8888
+      nodePort: 30002
+
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: springconfigserver
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: springconfigserver
+  template:
+    metadata:
+      labels:
+        app: springconfigserver
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V742-spring-cloud-config-server
+          imagePullPolicy: Always
+          name: springconfigserver
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+          ports:
+            - name: configserver
+              containerPort: 8888
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+
+
+
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: supportservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: supportservice
+  template:
+    metadata:
+      labels:
+        app: supportservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V113-supportMicroService
+          imagePullPolicy: Always
+          name: supportservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8087
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tickerservice
+spec:
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: tickerservice
+  template:
+    metadata:
+      labels:
+        app: tickerservice
+    spec:
+      serviceAccountName: uat
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 0
+      terminationGracePeriodSeconds: 0
+      containers:
+        - image: 10.1.144.74/snoc/snoc:V113-tickerMicroService
+          imagePullPolicy: Always
+          name: tickerservice
+          command: ["bash", "-c"]
+          args:
+            - |
+              java -jar  *.jar
+
+          ports:
+            - name: discovery
+              containerPort: 8095
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: APPSERVER_CONF_PATH
+              value: "/home/appuser/snoc/snocconf"
+            - name: MS_LOG_DIR
+              value: "/home/appuser/microservice/logs"
+          volumeMounts:
+            - mountPath: /home/appuser/microservice/logs
+              name: logs
+            - mountPath: /home/appuser/act_images
+              name: images
+            - mountPath: /home/appuser/org_documents
+              name: documents
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "10.1.145.6"
+          hostnames:
+            - "mongor1.enhancesys.com"
+            - "mongor2.enhancesys.com"
+            - "mongor3.enhancesys.com"
+            - "mongor4.enhancesys.com"
+            - "reportr1.enhancesys.com"
+            - "reportr2.enhancesys.com"
+            - "reportr3.enhancesys.com"
+            - "externalr1.enhancesys.com"
+            - "externalr2.enhancesys.com"
+            - "externalr3.enhancesys.com"
+        - ip: "10.1.145.7"
+          hostnames:
+            - "postgresdb.enhancesys.com"
+
+      volumes:
+        - name: logs
+          persistentVolumeClaim:
+            claimName: logs-claim
+        - name: images
+          persistentVolumeClaim:
+            claimName: images-claim
+        - name: documents
+          persistentVolumeClaim:
+            claimName: documents-claim
+[appuser@sblsftapt01 SVC]$
