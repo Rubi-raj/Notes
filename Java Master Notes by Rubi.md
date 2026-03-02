@@ -299,7 +299,7 @@ employeeList.sort(
 ## 🔍 How HashMap internally works ?
 
 > * Default capacity is **16**.
-> * Internally HashMap contains **Array of LinkedList**.
+> * Internally HashMap implemented as an **Array of buckets** where each bucket is a **LinkedList**.
 > * HashMap uses **Hashing**.
 > * All the key value pairs are stored in Heap, only the **Address is stored in an array bucket**.
 > * put(), get(), remove() all these operations are **O(1)** Time complexity.
@@ -634,3 +634,24 @@ void process() {
 	User user = new User("Rubi");
 }
 ```
+
+## 🔍 Collection Framework
+
+| Collection            | Type         | Underlying DS            | Default Capacity | Order Maintained | Sorted     | Duplicate Allowed | Null Allowed     | Thread Safe | Time Complexity (Search) | Special Notes           |
+|-----------------------|--------------|--------------------------|------------------|------------------|------------|-------------------|------------------|-------------|--------------------------|-------------------------|
+| **ArrayList**         | List         | Dynamic Array            | 10               | ✅ Yes            | ❌          | ✅ Yes             | ✅ Yes            | ❌           | O(1)                     | Fast random access      |
+| **LinkedList**        | List / Queue | Doubly Linked List       | 0                | ✅ Yes            | ❌          | ✅ Yes             | ✅ Yes            | ❌           | O(n)                     | Fast insert/delete      |
+| **Vector**            | List         | Dynamic Array            | 10               | ✅ Yes            | ❌          | ✅ Yes             | ✅ Yes            | ✅           | O(1)                     | Legacy synchronized     |
+| **Stack**             | List (LIFO)  | Vector                   | 10               | ✅ Yes            | ❌          | ✅ Yes             | ✅ Yes            | ✅           | O(1)                     | Legacy stack class      |
+| **HashSet**           | Set          | HashMap                  | 16               | ❌ No             | ❌          | ❌ No              | ✅ One null       | ❌           | O(1)                     | Uses HashMap internally |
+| **LinkedHashSet**     | Set          | HashMap + Linked List    | 16               | ✅ Insertion      | ❌          | ❌ No              | ✅ One null       | ❌           | O(1)                     | Predictable iteration   |
+| **TreeSet**           | Set          | Red-Black Tree           | N/A              | ✅ Yes            | ✅ Yes      | ❌ No              | ❌ No             | ❌           | O(log n)                 | Sorted unique elements  |
+| **PriorityQueue**     | Queue        | Heap                     | 11               | ❌                | ✅ Priority | ✅ Yes             | ❌ No             | ❌           | O(log n)                 | Head = highest priority |
+| **ArrayDeque**        | Queue/Deque  | Resizable Array          | 16               | ✅ Yes            | ❌          | ✅ Yes             | ❌ No             | ❌           | O(1)                     | Faster than Stack       |
+| **HashMap**           | Map          | Hash Table               | 16               | ❌ No             | ❌          | Keys Unique       | ✅ 1 key + values | ❌           | O(1)                     | Most used Map           |
+| **LinkedHashMap**     | Map          | Hash Table + Linked List | 16               | ✅ Insertion      | ❌          | Keys Unique       | ✅ 1 key + values | ❌           | O(1)                     | Used in LRU cache       |
+| **TreeMap**           | Map          | Red-Black Tree           | N/A              | ✅ Yes            | ✅ Yes      | Keys Unique       | ❌ Null key       | ❌           | O(log n)                 | Sorted Map              |
+| **Hashtable**         | Map          | Hash Table               | 11               | ❌ No             | ❌          | Keys Unique       | ❌ No null        | ✅           | O(1)                     | Legacy synchronized     |
+| **ConcurrentHashMap** | Map          | Segmented Hash Table     | 16               | ❌ No             | ❌          | Keys Unique       | ❌ No null        | ✅           | O(1)                     | High concurrency        |
+
+
