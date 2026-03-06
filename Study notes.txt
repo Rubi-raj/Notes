@@ -163,3 +163,49 @@ class Person {
 		this.address = new Address(otherPerson.address); // Deep copy
 	}
 }
+
+==============================
+
+
+Default PostgreSQL page size: 8 KB (8192 bytes)
+
+B-Tree is the default index used in PostgreSQL.
+
+
+Database Indexing
+
+Without index entired table will load into ram and it scan each row sequently.
+
+How to find a Row in a DB without index ?
+	
+	1. Pull a page into memory and search for the row.
+	2. Pull another page into memory and search for the row.
+	3. Repeat untill row is found.
+
+How many row's are there for each Page ?
+What is ACID Transactions ?
+
+
+DB Indexing data Structres 
+
+	1. B-Tree (Well and recommended for 'range query', 'sorting')
+	2. Hash Index (Well and recommended for 'Exact Matches' only)
+	3. Geospatial Index (for Location data) it was builded on top of B-Tree
+	4. QuadTrees
+	5. R-Tree
+	6. Inverted Index (Full Text search)
+
+
+📘 ACID Transactions — Interview Notes	
+	
+✅ What is a Transaction?
+
+A transaction is a group of database operations executed as one logical unit of work.
+Either: ✅ Both succeed ❌ Or both fail
+
+| Letter | Property    | Meaning                      |
+| ------ | ----------- | ---------------------------- |
+| A      | Atomicity   | All or nothing               |
+| C      | Consistency | Valid data state             |
+| I      | Isolation   | Transactions don't interfere |
+| D      | Durability  | Data survives crashes        |

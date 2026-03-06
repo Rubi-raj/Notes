@@ -43,6 +43,7 @@ DLT stands for Dead Letter Topic, means If a message is not able to consume by c
 
 Kafka is not a Queue it's a Log.
 Topic is a durable log of events.
+Log is a append only file, it append logs at end of the file.
 
 Why Kafka is fast ?
 
