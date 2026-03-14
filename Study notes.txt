@@ -209,3 +209,26 @@ Either: ✅ Both succeed ❌ Or both fail
 | C      | Consistency | Valid data state             |
 | I      | Isolation   | Transactions don't interfere |
 | D      | Durability  | Data survives crashes        |
+
+=========================
+
+Proxy vs Reverse Proxy ?
+
+Proxy
+Forward Proxy work for client side(VPN)
+Eg:- Employee using office server using VPN.
+
+Reverse Proxy work for server side(Load Balancer, Rate Limiting, security check)
+Eg:- Accessing netflix.com
+
+
+===============
+
+LocalDate dob = LocalDate.of(1997, 8, 10);
+LocalDate start = LocalDate.of(1997, 3, 1);
+LocalDate end = LocalDate.of(2026, 3, 31);
+
+System.out.println(!dob.isBefore(start) && !dob.isAfter(end));
+
+Period period = Period.between(dob, LocalDate.now());
+System.out.printf("%s Years %s Months %s Days", period.getYears(), period.getMonths(), period.getDays());
