@@ -655,3 +655,41 @@ void process() {
 | **ConcurrentHashMap** | Map          | Segmented Hash Table     | 16               | ❌ No             | ❌          | Keys Unique       | ❌ No null        | ✅           | O(1)                     | High concurrency        |
 
 
+
+````
+
+ArrayList:-
+===========
+ArrayList internally use resizable array.
+Default size is 10.
+
+
+What is transient, volatile, native keyword ?
+Iterator vs Spliterator ?
+
+How to merge two array?
+Why serialization needed?
+
+class Node<E> {
+	
+	Node<E> prev,
+	E element,
+	Node<E> next
+	
+	Node<E>(Node<E> prev, E element, Node<E> next) {
+		this.prev = prev;
+		this.element = element;
+		this.next = next;
+	}
+}
+
+==============
+
+There are three types of Design Patters.
+
+* Creational Patterns
+* Structural Patterns
+* Behavioral Patterns
+
+
+Singleton - Lets you ensure that a class has only one instance, while providing a global access point to this instance.
