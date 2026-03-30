@@ -3,63 +3,65 @@
 ## 📝Index
 
 <!-- TOC -->
+
 * [🍵Java Notes by Rubi raj](#java-notes-by-rubi-raj)
-  * [📝Index](#index)
-  * [🔍 What is Java ?](#-what-is-java-)
-    * [🤔 Meaning of Java ?](#-meaning-of-java-)
-  * [🔍 Variables](#-variables)
-  * [🔍 Data Types](#-data-types)
-  * [🔍 JVM Memory](#-jvm-memory)
-  * [🔍 Naming Convention](#-naming-convention)
-  * [🔍 String](#-string)
-    * [1️⃣ Why is String immutable❓](#1-why-is-string-immutable)
-    * [2️⃣ Can we make String mutable❓](#2-can-we-make-string-mutable)
-    * [3️⃣ What is String Constant Pool ?](#3-what-is-string-constant-pool-)
-    * [4️⃣ String use `char[]` or `byte[]` to hold value❓](#4-string-use-char-or-byte-to-hold-value)
-    * [🔹Java 8 and bellow](#java-8-and-bellow)
-    * [🔹 After Java 9 (Compact Strings)](#-after-java-9-compact-strings)
-    * [5️⃣ Explain internal working of concatenation❓](#5-explain-internal-working-of-concatenation)
-  * [🔍 Abstract class vs Interface](#-abstract-class-vs-interface)
-    * [Abstract class](#abstract-class)
-    * [Interface](#interface)
-  * [🔍 final vs finally vs finalize ?](#-final-vs-finally-vs-finalize-)
-  * [🔍 equals() vs hashCode()](#-equals-vs-hashcode)
-  * [🔍 Comparable vs Comparator](#-comparable-vs-comparator)
-    * [🔹 Comparable](#-comparable)
-    * [🔹 Comparator](#-comparator)
-  * [🔍 How HashMap internally works ?](#-how-hashmap-internally-works-)
-    * [What is Hash Collision ?](#what-is-hash-collision-)
-    * [Internal Implementation](#internal-implementation)
-  * [🔍 Java Programs ?](#-java-programs-)
-  * [🔍 String Programs ?](#-string-programs-)
-  * [🔍 Concepts from core Java ?](#-concepts-from-core-java-)
-  * [🔍 Q/A](#-qa)
-  * [Exceptions in Java](#exceptions-in-java)
-    * [ArithmeticException](#arithmeticexception)
-    * [ArrayIndexOutOfBoundsException](#arrayindexoutofboundsexception)
-    * [ClassNotFoundException](#classnotfoundexception)
-    * [FileNotFoundException](#filenotfoundexception)
-    * [IOException](#ioexception)
-    * [InterruptedException](#interruptedexception)
-    * [NoSuchFieldException](#nosuchfieldexception)
-    * [NoSuchMethodException](#nosuchmethodexception)
-    * [NullPointerException](#nullpointerexception)
-    * [NumberFormatException](#numberformatexception)
-    * [RuntimeException](#runtimeexception)
-    * [StringIndexOutOfBoundsException](#stringindexoutofboundsexception)
-    * [InputMismatchException](#inputmismatchexception)
+	* [📝Index](#index)
+	* [🔍 What is Java ?](#-what-is-java-)
+		* [🤔 Meaning of Java ?](#-meaning-of-java-)
+	* [🔍 Variables](#-variables)
+	* [🔍 Data Types](#-data-types)
+	* [🔍 JVM Memory](#-jvm-memory)
+	* [🔍 Naming Convention](#-naming-convention)
+	* [🔍 String](#-string)
+		* [1️⃣ Why is String immutable❓](#1-why-is-string-immutable)
+		* [2️⃣ Can we make String mutable❓](#2-can-we-make-string-mutable)
+		* [3️⃣ What is String Constant Pool ?](#3-what-is-string-constant-pool-)
+		* [4️⃣ String use `char[]` or `byte[]` to hold value❓](#4-string-use-char-or-byte-to-hold-value)
+		* [🔹Java 8 and bellow](#java-8-and-bellow)
+		* [🔹 After Java 9 (Compact Strings)](#-after-java-9-compact-strings)
+		* [5️⃣ Explain internal working of concatenation❓](#5-explain-internal-working-of-concatenation)
+	* [🔍 Abstract class vs Interface](#-abstract-class-vs-interface)
+		* [Abstract class](#abstract-class)
+		* [Interface](#interface)
+	* [🔍 final vs finally vs finalize ?](#-final-vs-finally-vs-finalize-)
+	* [🔍 equals() vs hashCode()](#-equals-vs-hashcode)
+	* [🔍 Comparable vs Comparator](#-comparable-vs-comparator)
+		* [🔹 Comparable](#-comparable)
+		* [🔹 Comparator](#-comparator)
+	* [🔍 How HashMap internally works ?](#-how-hashmap-internally-works-)
+		* [What is Hash Collision ?](#what-is-hash-collision-)
+		* [Internal Implementation](#internal-implementation)
+	* [🔍 Java Programs ?](#-java-programs-)
+	* [🔍 String Programs ?](#-string-programs-)
+	* [🔍 Concepts from core Java ?](#-concepts-from-core-java-)
+	* [🔍 Q/A](#-qa)
+	* [Exceptions in Java](#exceptions-in-java)
+		* [ArithmeticException](#arithmeticexception)
+		* [ArrayIndexOutOfBoundsException](#arrayindexoutofboundsexception)
+		* [ClassNotFoundException](#classnotfoundexception)
+		* [FileNotFoundException](#filenotfoundexception)
+		* [IOException](#ioexception)
+		* [InterruptedException](#interruptedexception)
+		* [NoSuchFieldException](#nosuchfieldexception)
+		* [NoSuchMethodException](#nosuchmethodexception)
+		* [NullPointerException](#nullpointerexception)
+		* [NumberFormatException](#numberformatexception)
+		* [RuntimeException](#runtimeexception)
+		* [StringIndexOutOfBoundsException](#stringindexoutofboundsexception)
+		* [InputMismatchException](#inputmismatchexception)
 * [Java Notes by Rubi raj Mani](#java-notes-by-rubi-raj-mani)
-  * [1️⃣ How a Java Class will Load ?](#1-how-a-java-class-will-load-)
-  * [3️⃣ Method Overloading vs Overriding](#3-method-overloading-vs-overriding)
-    * [Hashtable vs Hashmap vs ConcurrentHashMap](#hashtable-vs-hashmap-vs-concurrenthashmap)
-  * [🔍 What is Java LTS Versions & Major Features](#-what-is-java-lts-versions--major-features)
-    * [**Java 8**](#java-8)
-    * [**Java 11**](#java-11)
-    * [**Java 17**](#java-17)
-    * [**Java 21**](#java-21)
-  * [🔍 Records](#-records)
-    * [📌 Record Scope](#-record-scope)
-    * [📌 Where Records Can Exist ?](#-where-records-can-exist-)
+	* [1️⃣ How a Java Class will Load ?](#1-how-a-java-class-will-load-)
+	* [3️⃣ Method Overloading vs Overriding](#3-method-overloading-vs-overriding)
+		* [Hashtable vs Hashmap vs ConcurrentHashMap](#hashtable-vs-hashmap-vs-concurrenthashmap)
+	* [🔍 What is Java LTS Versions & Major Features](#-what-is-java-lts-versions--major-features)
+		* [**Java 8**](#java-8)
+		* [**Java 11**](#java-11)
+		* [**Java 17**](#java-17)
+		* [**Java 21**](#java-21)
+	* [🔍 Records](#-records)
+		* [📌 Record Scope](#-record-scope)
+		* [📌 Where Records Can Exist ?](#-where-records-can-exist-)
+
 <!-- TOC -->
 
 1. What is Java ?
@@ -104,11 +106,11 @@ Variable is a key to store their values. There are three types of variables.
 ## 🔍 JVM Memory
 
 * **Method Area** - Metadata of the class, Blueprint of the class.
-    * Static variables
-    * Class name
-    * Immediate parent class name
-    * Methods
-    * Variables information
+	* Static variables
+	* Class name
+	* Immediate parent class name
+	* Methods
+	* Variables information
 * **Heap Memory** - All objects is stored in the heap area. (**Instance variables**)
 * **Stack Memory** - Thread audit information, **Reference variables.**
 * **PC Registers** - Store address of **current execution thread information**. Each thread has separate PC
@@ -174,8 +176,8 @@ It's present inside Heap Space.
 ### 🔹 After Java 9 (Compact Strings)
 
 * Java 9 introduced **Compact Strings**, String stored data as `byte[]`.
-    * `byte[] value` → actual data
-    * `coder` → tells encoding type
+	* `byte[] value` → actual data
+	* `coder` → tells encoding type
 
 | coder value | Meaning                  |
 |-------------|--------------------------|
@@ -215,7 +217,6 @@ String a = "Hello" + "World"; // executes at compile time
  *     both the literals are added together at compile time.
  *  3. The final result "Hello World" gets saved in Stirng Constant Pool.
  */
-/
 
 ```
 <!-- @formatter:on -->
@@ -324,55 +325,6 @@ hash(kavin) --> 6
 * Hashmap will pass **Key to Hash function**, output will be used for **indexing the array**.
 * If Collision happened it will be added in LinkedList of the same index.
 
-## 🔍 Java Programs ?
-
-1. Leap Year
-2. Armstrong Number
-3. Prime Number
-4. Twin Prime Number
-5. Factorial of a Number
-6. Fibonacci series
-7. um of natural numbers
-8. Integer Palindrome
-9. largest of three numbers
-10. swap two numbers
-11. swap two numbers without using 3rd variables
-12. km-meter / meter-km conversion
-13. Shortest division of a Number
-
-## 🔍 String Programs ?
-
-1. String palindrome
-2. Letter count in a sentence
-3. word count in a sentence
-4. remove vowels from a string
-5. delete given character from a given String
-6. reverse a string
-7. reverse letters of word in a String
-8. Print the series of given number (1 to 9) for given number of times. For example, write number 9, 3 times means 9,
-   99, 999
-9. Biggest number amount 3 numbers
-10. Biggest number among 10 numbers
-11. Biggest number among N numbers
-12. Reverse letters of words in a given sentence
-13. Count number of distinct letters in a given sentence
-14. Get set of numbers and store in a list and sum only even numbers
-15. Perform exercise 3 by storing data to arraylist and then perform
-16. Assign numbers starting from 1 to 26 for English letters a to z and find out sum of a given sentence
-17. Find out first N prime numbers and print in reverse order
-18. Get two numbers in two different variables, swap and print output
-19. Get N numbers and store in an array list. Sort the values without using inbuilt function
-20. Merge two arrays and create a new array with numbers in sorted order. Should not use inbuilt function.
-21. Delete given character from the given sentence
-22. Delete vowels from the given sentence
-23. Sort letters of a sentence in alphabetical order
-24. consecutive letters // parallel letters
-25. Sentence reverse
-26. get numbers from user continuously if 100 means exit the program and find smallest and greatest number
-27. In each word print 3rd letter
-28. In each word print last letter
-29. find letter without space in a sentence
-30. reverse each word
 
 ## 🔍 Concepts from core Java ?
 
@@ -653,8 +605,6 @@ void process() {
 | **TreeMap**           | Map          | Red-Black Tree           | N/A              | ✅ Yes            | ✅ Yes      | Keys Unique       | ❌ Null key       | ❌           | O(log n)                 | Sorted Map              |
 | **Hashtable**         | Map          | Hash Table               | 11               | ❌ No             | ❌          | Keys Unique       | ❌ No null        | ✅           | O(1)                     | Legacy synchronized     |
 | **ConcurrentHashMap** | Map          | Segmented Hash Table     | 16               | ❌ No             | ❌          | Keys Unique       | ❌ No null        | ✅           | O(1)                     | High concurrency        |
-
-
 
 ````
 
