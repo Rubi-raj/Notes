@@ -100,8 +100,8 @@ Variable is a key to store their values. There are three types of variables.
 
 ## 🔍 Data Types
 
-* **Primitive** - byte, short, int, long, float, double, char and boolean
-* **Non-Primitive** (Reference data type) String, Array
+* **Primitive** - `byte`, `short`, `int`, `long`, `float`, `double`, `char` and `boolean`
+* **Non-Primitive** (Reference data type) `String`, `Array`
 
 ## 🔍 JVM Memory
 
@@ -134,10 +134,10 @@ Variable is a key to store their values. There are three types of variables.
 📝 String variable can be created in two ways. **String literal** and **String Object**
 
 ```java
-// String literals | stored in String Constant Pool(SCP).
+// String literals | stored in String Constant Pool(SCP). | s1 points to SCP
 String s1 = "Hello";
 
-// String object | stored in Heap Memory like other objects. also in SCP.
+// String object |"world" → created in SCP | new String("world") → creates a new object in Heap memory | s2 points to the Heap object
 String s2 = new String("world");
 ```
 
@@ -147,6 +147,13 @@ String s2 = new String("world");
 | **Thread Safe**       | ❌ No         | ✅ Yes (synchronized)           | ❌ No                         |
 | **Overrides euqal()** | ✅ Yes        | ❌ No  </br>(value compared ==) | ❌ No</br>(value compared ==) |
 | **Memory**            | SCP and Heap | Heap                           | Heap                         |
+
+> **Note:** StringBuffer and StringBuilder value can **compare only converting them to String**.
+```java
+StringBuilder sb1 = new StringBuilder("hii");
+StringBuilder sb2 = new StringBuilder("hii");
+System.out.println(sb1.toString().equals(sb2.toString()));
+```
 
 ### 1️⃣ Why is String immutable❓
 
@@ -325,7 +332,6 @@ hash(kavin) --> 6
 * Hashmap will pass **Key to Hash function**, output will be used for **indexing the array**.
 * If Collision happened it will be added in LinkedList of the same index.
 
-
 ## 🔍 Concepts from core Java ?
 
 1. OOP'S concepts (Data Abstraction, Encapsulation, Inheritance, Polymorphism)
@@ -409,62 +415,26 @@ a.lastIndexOf("h",3) // display the index num /else return -1
 ```
 <!-- @formatter:on -->
 
-## Exceptions in Java
+## Exceptions❌ in Java
 
-### ArithmeticException
+### 📗Checked Exceptions:
 
-It is thrown when an exceptional condition has occurred in an arithmetic operation.
+* Checked exceptions are exceptions that must be **either declared** in the method signature using `throws` or **handled
+  using** `try-catch`.
+* They are **checked at compile-time**. 🕐
+* **Examples:**
+	- [x] `IOException` (e.g., file not found) 📂
+	- [x] `SQLException` (e.g., database connection failure) 💽
+	- [x] `InterruptedException` (e.g., thread interruption)
 
-### ArrayIndexOutOfBoundsException
+### 📙Unchecked Exceptions:
 
-It is thrown to indicate that an array has been accessed with an illegal index. The index is either negative or greater
-than or equal to the size of the array.
-
-### ClassNotFoundException
-
-This Exception is raised when we try to access a class whose definition is not found
-
-### FileNotFoundException
-
-This Exception is raised when a file is not accessible or does not open.
-
-### IOException
-
-It is thrown when an input-output operation failed or interrupted
-
-### InterruptedException
-
-It is thrown when a thread is waiting , sleeping , or doing some processing , and it is interrupted.
-
-### NoSuchFieldException
-
-It is thrown when a class does not contain the field (or variable) specified
-
-### NoSuchMethodException
-
-It is thrown when accessing a method which is not found.
-
-### NullPointerException
-
-This exception is raised when referring to the members of a null object. Null represents nothing
-
-### NumberFormatException
-
-This exception is raised when a method could not convert a string into a numeric format.
-
-### RuntimeException
-
-This represents any exception which occurs during runtime.
-
-### StringIndexOutOfBoundsException
-
-It is thrown by String class methods to indicate that an index is either negative than the size of the string
-
-### InputMismatchException
-
-If you are entering wrong datatype.
-
----
+* Unchecked exceptions are **runtime errors** that **do not require explicit handling**.❌
+* They are **checked at runtime**, meaning they occur due to **logical errors** in the program.🧠
+* **Examples:**
+	- [x] `NullPointerException` (e.g., calling a method on `null`) ⛔
+	- [x] `ArrayIndexOutOfBoundsException` (e.g., access an invalid array index)
+	- [x] `ArithmeticException` (e.g., division by zero) ➗
 
 # Java Notes by Rubi raj Mani
 
