@@ -34,12 +34,10 @@ DLT stands for Dead Letter Topic, means If a message is not able to consume by c
 
 ## Kafka Data Structure
 
-1. Kafka stores an Events/Message in LOG.
-2. LOG is an ordered sequence of Events/Message.
-3. LOG is an ordered sequence of immutable Records.
-4. Topic is an ordered collection of Events/Message that stored in a Durable way.
-5. Events/Message are immutable.
-6. Logs. Not queues. (Kafka doesn't have queue. A topic is not a queue it's a LOG)
+1. Kafka stores messages as an ordered log of immutable records.
+2. A topic is a durable, ordered log of events.
+3. Messages (records) are immutable once written.
+4. Kafka uses logs, not queues.
 
 Kafka Topic contains:
 
