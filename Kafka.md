@@ -7,28 +7,19 @@
 Apache Kafka is a **distributed streaming platform** used for building real-time data pipelines and applications, acting
 as a high-throughput, low-latency platform for handling real-time data feeds.
 
+Kafka is not a Queue it's a Log.
+Topic is a durable log of events.
+Log is an append only file, it appends logs at end of the file.
+
 ## What is DLT ?
 
 DLT stands for Dead Letter Topic, means If a message is not able to consume by consumer it send to DLT.
 
 ### Modules
 
-| Name                | Description                                        |
-|---------------------|----------------------------------------------------|
-| **Producer**        | Publish a Message/Events                           |
-| **Consumer**        | Consuming a Message/Events                         |
-| **Broker**          | Distributed System (Available in multiple servers) |
-| **Cluster**         | Kafka Server                                       |
-| **Topic**           | Like Queue                                         |
-| **Partitions**      | Spliting a Topic into multiple Partitions.         |
-| **Offset**          | Index of the Messages called Offset number.        |
-| **Consumer Groups** | Grouping the Consumers.                            |
-| **Zookeeper**       | Managing a Kafka                                   |
-
-### Elaborated:-
-
-| Producer              | An application that publishes data (messages) to Kafka topics. It optimizes, serializes, and balances messages across partitions. |
-|:----------------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| Module                | Details                                                                                                                           |
+|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| **Producer**          | An application that publishes data (messages) to Kafka topics. It optimizes, serializes, and balances messages across partitions. |
 | **Consumer**          | An application that subscribes to Kafka topics and reads messages from partitions, typically within a consumer group.             |
 | **Broker**            | A Kafka server that manages message storage and handles read/write requests. Brokers work together to form a Kafka cluster.       |
 | **Topic**             | A logical channel that organizes messages. Producers write to topics, and consumers subscribe to them.                            |
@@ -41,33 +32,14 @@ DLT stands for Dead Letter Topic, means If a message is not able to consume by c
 
 ---
 
-Kafka is not a Queue it's a Log.
-Topic is a durable log of events.
-Log is a append only file, it append logs at end of the file.
+## Kafka Data Structure
 
-Why Kafka is fast ?
-
-Sequential I/O
-Append only log as a primary Data structure
-
-1. What is Replication factor in Kafka?
-2. What is Leader/Follower concept in Kafka?
-
-Kafka Retention Policy ?
-
-Two Settings:
-
-1. retention.ms (default 7 days) - how long to keep a message
-2. retention.bytes (default 1GB) - when to start purging based on size
-
-Kafka Data Structure
-
-	1. Kafka stores a Events/Message in LOG.
-	2. LOG is an ordered sequence of Events/Message.
-	2. LOG is an ordered sequence of immutable Records.
-	3. Topic is an ordered collection of Events/Message that stored in a Durable way.
-	4. Events/Message are immutable.
-	5. Logs. Not queues. (Kafka doesn't have queue. A topic is not a queue its a LOG)
+1. Kafka stores an Events/Message in LOG.
+2. LOG is an ordered sequence of Events/Message.
+3. LOG is an ordered sequence of immutable Records.
+4. Topic is an ordered collection of Events/Message that stored in a Durable way.
+5. Events/Message are immutable.
+6. Logs. Not queues. (Kafka doesn't have queue. A topic is not a queue it's a LOG)
 
 Kafka Topic contains:
 
@@ -76,9 +48,7 @@ Kafka Topic contains:
 * Value
 * Timestamp
 
-Log retention and compaction
-
-Two Settings:
+## Kafka Retention Policy
 
 1. retention.ms (default 7 days) - how long to keep a message
 2. retention.bytes (default 1GB) - when to start purging based on size
@@ -86,15 +56,15 @@ Two Settings:
 ## Partitions:
 
 1. Partitions are multiple log files inside one Topic.
-2. Producing message if partition dosent specified, on round-robin message assigned to the partitions
-3. Single Topic log splited into multiple logs called Partition.
-4. If the message dosen't have key, the messages are distributed Round Robin across Partitions.
+2. Producing message if partition doesn't specify, on round-robin message assigned to the partitions
+3. Single Topic log split into multiple logs called Partition.
+4. If the message doesn't have key, the messages are distributed Round Robin across Partitions.
 5. Kafka guarantees ordering only inside a partition.
 
 ## Brokers:
 
-	1. A single Kafka server instance that stores data and serves client requests.
-	2. Brokers are a Part of Kafka cluster, an instance ruuning in a single machine or pod.
+1. A single Kafka server instance that stores data and serves client requests.
+2. Brokers are a Part of Kafka cluster, an instance ruuning in a single machine or pod.
 
 ## Replication:
 
